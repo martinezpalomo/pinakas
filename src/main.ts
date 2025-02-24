@@ -1,6 +1,11 @@
+import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { AppComponent } from './app/app.component';  // Standalone component
+import { environment } from './environments/environment';
 
-import { AppModule } from './app/app.module';
+if (environment.production) {
+  enableProdMode();
+}
 
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.log(err));
+platformBrowserDynamic().bootstrapApplication(AppComponent)  // Bootstrapping the standalone AppComponent
+  .catch((err: any) => console.log(err));  // Fixing the implicit 'any' type error

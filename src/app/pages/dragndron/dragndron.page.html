@@ -1,0 +1,307 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Pinakas</ion-title>
+    <!-- <ion-buttons slot="start">
+      <ion-back-button (click)="back()"></ion-back-button>
+    </ion-buttons> -->
+    <ion-buttons slot="end">
+
+      <!-- <ion-buttons slot="start">
+      
+        
+        <ion-button (click)="savePositions()" [ngClass]="{'clicked': isButtonClicked}" style="margin-right: 15px;">
+          <ion-icon name="bookmark-outline" size="large"></ion-icon>
+        </ion-button>
+      </ion-buttons> -->
+
+      <!-- <ion-buttons slot="end">
+        <ion-button (click)="loadPositions()">
+          <ion-icon name="refresh-circle-outline" size="large" style="margin-right: 15px;"></ion-icon>
+        </ion-button>
+      </ion-buttons> -->
+      <ion-button (click)="saveFrame()">Save Frame</ion-button>
+      <ion-button (click)="playAnimationWithDelay()"><ion-icon name="play"></ion-icon></ion-button>
+      <ion-button (click)="stopAnimation()"><ion-icon name="stop"></ion-icon></ion-button>
+      <ion-button (click)="resetAnimation()"><ion-icon name="refresh"></ion-icon></ion-button>
+
+      <ion-button *ngIf="isNumberVisible" (click)="assignUniqueNumbers()">
+        <ion-icon name="eye-outline" size="large"></ion-icon>
+        <span style="font-size: 1.2rem;">#</span>
+      </ion-button>
+
+      <ion-button *ngIf="!isNumberVisible" (click)="removeNumberFromAllCircles()">
+        <ion-icon name="eye-off-outline" size="large"></ion-icon>
+        <span style="font-size: 1.2rem;">#</span>
+      </ion-button>
+      <!-- Botón para abrir el menú -->
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Sección para los botones de patrones -->
+  <ion-toolbar *ngIf="mostarToolbarPatrones">
+    <ion-buttons slot="start" class="button-container">
+      <!-- Patrón inicial -->
+      <ion-button (click)="calculateCirclePositions('default')">
+        <!-- <ion-icon name="star-outline" size="large"></ion-icon> -->
+        <span style="font-size: 1.1rem;"><strong>ºººº</strong></span>
+      </ion-button>
+
+      <!-- Patrón amplitud -->
+      <ion-button (click)="calculateCirclePositions('amplitud')">
+        <ion-icon name="ellipsis-horizontal-outline" size="large"></ion-icon>
+      </ion-button>
+
+      <!-- Otros botones de patrón -->
+      <ion-button (click)="calculateCirclePositions('triangulo')">
+        <ion-icon name="triangle-outline" size="large" class="flip-vertical"></ion-icon>
+      </ion-button>
+
+      <ion-button (click)="calculateCirclePositions('trianguloInvertido')">
+        <ion-icon name="triangle-outline" size="large"></ion-icon>
+      </ion-button>
+
+      <ion-button (click)="calculateCirclePositions('filaIndia')">
+        <ion-icon name="ellipsis-vertical-outline" size="large"></ion-icon>
+      </ion-button>
+
+      <ion-button (click)="calculateCirclePositions('patronT')">
+        <ion-icon name="ellipsis-vertical-outline" size="large" style="transform: rotate(135deg);"></ion-icon>
+      </ion-button>
+
+      <ion-button (click)="calculateCirclePositions('patronLaser')">
+        <ion-icon name="ellipsis-vertical-outline" size="large" style="transform: rotate(45deg);"></ion-icon>
+      </ion-button>
+
+      <!-- Sistema 4-0 -->
+      <ion-button (click)="calculateCirclePositions('sistema40')">
+        <span style="font-size: 1.5rem;">4-0</span>
+      </ion-button>
+
+      <!-- Sistema 2-2 -->
+      <ion-button (click)="calculateCirclePositions('sistema22')">
+        <span style="font-size: 1.5rem;">2-2</span>
+      </ion-button>
+
+      <!-- Sistema 1-2-1 -->
+      <ion-button (click)="calculateCirclePositions('sistema121')">
+        <span style="font-size: 1.5rem;">1-2-1</span>
+      </ion-button>
+
+      <!-- Delaunay -->
+      <ion-button (click)="mostrarDelaunay()">
+
+        <span *ngIf="showDelaunay == true" style="font-size: 1.5rem;">Vor</span>
+        <span *ngIf="showDelaunay == false" style="font-size: 1.5rem;">Del</span>
+      </ion-button>
+
+      <!-- Giro Horizontal -->
+      <!-- <ion-button (click)="flipCirclesHorizontally()">
+        <ion-icon name="prism" size="large"></ion-icon>
+      </ion-button> -->
+
+      <!-- <ion-list>
+        <ion-item>
+          <ion-select
+            aria-label="Altura"
+            placeholder="Altura"
+            (ionChange)="handleChange($event)"
+            (ionCancel)="handleCancel()"
+            (ionDismiss)="handleDismiss()"
+          >
+            <ion-select-option value="0.00">0.00</ion-select-option>
+            <ion-select-option value="0.10">0.10</ion-select-option>
+            <ion-select-option value="0.20">0.20</ion-select-option>
+            <ion-select-option value="0.30">0.30</ion-select-option>
+            <ion-select-option value="0.40">0.40</ion-select-option>
+            <ion-select-option value="0.50">0.50</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-list> -->
+
+
+
+
+    </ion-buttons>
+  </ion-toolbar>
+
+
+</ion-header>
+
+<!-- Menú deslizable -->
+<ion-menu side="end" content-id="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Opciones del Menú</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-list>
+      <ion-item button (click)="ngOnInit()">
+        <span style="font-size: 0.9rem;">ºººº</span>
+        <ion-label>Patrón Inicial</ion-label>
+      </ion-item>
+      <ion-item button (click)="calculateCirclePositions('amplitud')">
+        <ion-icon name="ellipsis-horizontal-outline" slot="start"></ion-icon>
+        <ion-label>Patrón Amplitud</ion-label>
+      </ion-item>
+      <ion-item button (click)="calculateCirclePositions('triangulo')">
+        <ion-icon name="triangle-outline" slot="start" class="flip-vertical"></ion-icon>
+        <ion-label>Patrón Triángulo</ion-label>
+      </ion-item>
+      <ion-item button (click)="calculateCirclePositions('trianguloInvertido')">
+        <ion-icon name="triangle-outline" slot="start"></ion-icon>
+        <ion-label>Patrón Triángulo Invertido</ion-label>
+      </ion-item>
+      <ion-item button (click)="calculateCirclePositions('filaIndia')">
+        <ion-icon name="ellipsis-vertical-outline" slot="start"></ion-icon>
+        <ion-label>Patrón Fila India</ion-label>
+      </ion-item>
+      <ion-item button (click)="calculateCirclePositions('patronT')">
+        <ion-icon name="ellipsis-vertical-outline" slot="start" style="transform: rotate(135deg);"></ion-icon>
+        <ion-label>Patrón T</ion-label>
+      </ion-item>
+      <ion-item button (click)="calculateCirclePositions('patronLaser')">
+        <ion-icon name="ellipsis-vertical-outline" slot="start" style="transform: rotate(45deg);"></ion-icon>
+        <ion-label>Patrón Láser</ion-label>
+      </ion-item>
+      <ion-item button (click)="calculateCirclePositions('sistema40')">
+        <ion-icon slot="start">
+          <span style="font-size: 1.5rem;">4-0</span>
+        </ion-icon>
+        <ion-label>Sistema 4-0</ion-label>
+      </ion-item>
+      <ion-item button (click)="calculateCirclePositions('sistema22')">
+        <ion-icon slot="start">
+          <span style="font-size: 1.5rem;">2-2</span>
+        </ion-icon>
+        <ion-label>Sistema 2-2</ion-label>
+      </ion-item>
+      <ion-item button (click)="calculateCirclePositions('sistema121')">
+        <ion-icon slot="start">
+          <span style="font-size: 1.5rem;">1-2-1</span>
+        </ion-icon>
+        <ion-label>Sistema 1-2-1</ion-label>
+      </ion-item>
+
+
+      <!-- Delaunay  / Voronoi-->
+      <ion-item *ngIf="showDelaunay == true" (click)="mostrarDelaunay()">
+        <ion-icon name="map-outline"></ion-icon>
+        <span style="font-size: 1.5rem;">Voronoi--</span>
+      </ion-item>
+      <ion-item *ngIf="showDelaunay == false" (click)="mostrarDelaunay()">
+        <ion-icon name="git-merge-outline"></ion-icon>
+        <ion-label style="font-size: 1.5rem;">Delaunay</ion-label>
+      </ion-item>
+
+
+
+      <!-- <ion-item button (click)="flipCirclesHorizontally()">
+        <ion-icon  name="prism" slot="start" >
+          <span style="font-size: 1.5rem;">1-2-1</span>
+        </ion-icon>
+        <ion-label>Flip horizontal</ion-label>
+      </ion-item> -->
+
+
+
+
+
+
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<ion-content class="ion-padding" id="main-content">
+  <div style="position: relative; width: 100%; height: 100%;">
+    <canvas id="extraCanvas"></canvas>
+    <canvas #canvas style="width: 100%; height: 100%; cursor: grab;"></canvas>
+
+    <!-- <canvas #canvas (pointerdown)="onPointerDown($event, circleId)" (pointermove)="onPointerMove($event, circleId)"> -->
+    <!-- </canvas> -->
+
+
+    <!-- Líneas verticales al 20%, 40%, 60% y 80% -->
+    <div class="linea-vertical" [style.left.%]="20"></div>
+    <div class="linea-vertical" [style.left.%]="40"></div>
+    <div class="linea-vertical" [style.left.%]="60"></div>
+    <div class="linea-vertical" [style.left.%]="80"></div>
+  </div>
+
+  <div class="alturaPatron" id="movableDiv" [ngClass]="{'collapsed': isCollapsed}">
+    <!-- Icono de ojo para expandir/contraer -->
+    <div class="toggle-icon" (click)="toggleMovableDiv()">
+      <ion-icon [name]="isCollapsed ? 'eye-outline' : 'eye-off-outline'" size="large"></ion-icon>
+    </div>
+
+    <div class="content">
+      <button class="up" (click)="decreaseValue()">
+        <ion-icon name="arrow-up-outline" size="large"></ion-icon>
+      </button>
+
+      <div class="horizontal-buttons">
+        <button class="left" (click)="decreaseXValue()">
+          <ion-icon name="arrow-back-outline" size="large"></ion-icon>
+        </button>
+        <button class="right" (click)="increaseXValue()">
+          <ion-icon name="arrow-forward-outline" size="large"></ion-icon>
+        </button>
+      </div>
+
+      <button class="down" (click)="increaseValue()">
+        <ion-icon name="arrow-down-outline" size="large"></ion-icon>
+      </button>
+
+      <button (click)="flipCirclesHorizontally()">
+        <ion-icon name="prism" size="large"></ion-icon>
+      </button>
+    </div>
+
+  </div>
+
+<!-- 
+  <div class="alturaPatron" id="movableDiv2" [ngClass]="{'collapsed': isCollapsed2}">
+  
+    <div class="toggle-icon" (click)="toggleMovableDiv2()">
+      <ion-icon [name]="isCollapsed2 ? 'eye-outline' : 'eye-off-outline'" size="large"></ion-icon>
+    </div>
+
+    <div class="content">
+      <ion-button (click)="saveFrame()">Save Frame</ion-button>
+
+      <div style="display: flex; justify-content: center; gap: 8px;">
+        <ion-button (click)="playAnimationWithDelay()"><ion-icon name="play"></ion-icon></ion-button>
+        <ion-button (click)="stopAnimation()"><ion-icon name="stop"></ion-icon></ion-button>
+        <ion-button (click)="resetAnimation()"><ion-icon name="refresh"></ion-icon></ion-button>
+      </div>
+
+      <div class="segment-container">
+        <ion-segment (ionChange)="updateAnimationSpeed($event)" [value]="animationSpeed">
+          <ion-segment-button value="0.10" size="small">
+            <ion-label>0.10x</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="0.25" size="small">
+            <ion-label>0.25x</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="0.5" size="small">
+            <ion-label>0.5x</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="1" size="small">
+            <ion-label>1x</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+    </div>
+
+  </div> -->
+
+
+
+
+  <!-- <div class="flipH">
+    <button (click)="flipCirclesHorizontally()">
+      <ion-icon name="prism" size="large"></ion-icon>
+    </button>
+  </div> -->
+</ion-content>

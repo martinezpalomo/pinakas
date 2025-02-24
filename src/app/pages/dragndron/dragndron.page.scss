@@ -1,0 +1,308 @@
+
+
+/* shadows.page.scss */
+ion-button {
+  --background: #007BFF;
+  /* Color inicial del botón */
+  --color: white;
+  /* Color del icono */
+}
+
+ion-button.clicked {
+  --background: #28A745;
+  /* Color cuando se hace clic (verde) */
+  --color: white;
+  /* Color del icono después del clic */
+}
+
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  cursor: grab;
+  user-select: none;
+  z-index: 1000;
+  /* Asegúrate de que esté encima del canvas */
+}
+
+.circle:active {
+  cursor: grabbing;
+}
+
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  /* Previene conflictos táctiles */
+
+
+    // border: 10px solid black;
+
+
+}
+
+.circle {
+  touch-action: none;
+}
+
+.circle {
+  width: var(--circle-diameter);
+  height: var(--circle-diameter);
+  top: calc(var(--circle-top) - var(--circle-diameter) / 2);
+  left: calc(var(--circle-left) - var(--circle-diameter) / 2);
+}
+
+
+.linea-vertical {
+  position: absolute;
+  width: 0;
+  /* Establecemos el ancho a 0 porque usaremos border */
+  height: 100%;
+  /* Altura de la línea, cubre toda la ventana */
+  border-left: 2px dashed darkgray;
+  /* Línea punteada de 2px de grosor y color darkgray */
+  z-index: 2;
+  /* Asegura que las líneas se dibujen sobre otros elementos */
+}
+
+.flip-vertical {
+  transform: scaleY(-1);
+}
+
+/* Hacer que el contenedor de botones use Flexbox */
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  /* Permite que los botones se ajusten a la siguiente fila si no caben */
+  justify-content: flex-start;
+  /* Alineación de los botones a la izquierda */
+  gap: 10px;
+
+  /* Espaciado entre los botones */
+}
+.alturaPatron {
+  position: absolute;
+  bottom: 20px;
+  left: 45px;
+  width: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 5px;
+  
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  cursor: move;
+
+  max-height: 80vh; /* Limita la altura para evitar el desbordamiento */
+  overflow: hidden; /* Asegura que no se muestren barras de desplazamiento */
+}
+
+
+.alturaPatron button, .flipH button {
+  
+  font-size: 14px;           
+  padding: 5px;              
+  background: hsl(120, 100%, 20%);  
+  color: white;             
+  border-radius: 15%;        
+  border: none;               
+  cursor: pointer;          
+  transition: background 0.3s ease-in-out;
+}
+
+.alturaPatron button:hover {
+  background: hsl(120, 100%, 30%);  
+}
+
+.horizontal-buttons {
+  display: flex;
+  justify-content: space-between;   
+  width: 100%;
+}
+
+.horizontal-buttons button {
+  width: 40%;            
+}
+
+
+.flipH {
+  position: absolute;
+  bottom: 20px;            
+  left: 10px;               
+  display: flex;
+  flex-direction: column;  
+  justify-content: flex-start;  
+  gap: 5px;                
+  padding: 5px;            
+  z-index: 1000;          
+  background-color: rgba(0, 0, 0, 0.5); 
+  border-radius: 5px;      
+}
+
+
+
+@media (max-width: 768px) {
+  .alturaPatron {
+    bottom: 10px;
+    right: 5px;
+    gap: 5px;
+  }
+
+  .flipH {
+    bottom: 10px;
+    left: 5px;
+    gap: 5px;
+  }
+}
+
+
+/* Para asegurar que los botones se ajusten bien en cada fila */
+ion-button {
+  white-space: nowrap;
+  /* Evita que el texto o el ícono se dividan en varias líneas */
+  flex: 1 0 auto;
+  /* Hace que los botones no crezcan más de lo necesario */
+}
+
+ion-back-button {
+  display: block;
+}
+
+.up, .down, .left, .right {
+  width: 40px;
+}
+
+
+html, body {
+  overflow: hidden !important; /* Asegura que no haya desplazamiento */
+  height: 100%;
+  margin: 0;
+  touch-action: none; /* Desactiva el desplazamiento táctil */
+}
+#movableDiv,
+#movableDiv2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden !important;
+  position: absolute;
+  bottom: 20px;
+  left: 40px;
+  width: 120px;
+  max-height: 80vh;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  cursor: move;
+  padding: 5px;
+  touch-action: none; /* Previene el desplazamiento táctil */
+}
+
+#movableDiv2 {
+  left: auto;
+  right: 40px;
+  width: 240px;
+}
+
+ion-segment {
+  margin-top: 10px;
+  width: 100%;
+}
+
+
+body {
+  -webkit-overflow-scrolling: touch; /* Hace el desplazamiento táctil más suave */
+}
+
+
+
+ion-title {
+  @media (max-width:480px) {
+    display: none;
+  }
+}
+
+
+#canvas {
+  width: 100%;
+  height: 100%;
+}
+
+#extraCanvas {
+  position: absolute;
+  top: -16px; 
+  // border: green 1px solid;
+  cursor: grab;
+  height: calc(100% + 32px); /* Aquí agregamos 32px más a la altura */
+
+}
+
+.segment-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+
+  .segment-group {
+    display: flex;
+    justify-content: center; /* Centrar horizontalmente */
+    gap: 2px; /* Espacio entre botones */
+    flex-wrap: nowrap; /* Evita que los botones se vayan a otra línea */
+    overflow-x: auto; /* Permite desplazamiento si no caben en pantallas pequeñas */
+  }
+
+  ion-segment-button {
+    flex: 1;
+    max-width: 10px;
+    text-align: center;
+    pointer-events: auto; // Asegura que sean clickeables
+    color: white;
+  }
+}
+
+.alturaPatron {
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  max-height: 300px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.alturaPatron.collapsed .content {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none; /* Evita clics cuando está oculto */
+}
+
+.toggle-icon {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centrar horizontalmente */
+  justify-content: center; /* Centrar verticalmente si es necesario */
+  gap: 4px; /* Espaciado entre los elementos */
+}
+
+ion-segment-button {
+  min-width: 70px !important; /* Ajusta según necesites */
+  flex-grow: 0; /* Evita que se expandan */
+}
+
+
