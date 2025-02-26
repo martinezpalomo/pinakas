@@ -2,11 +2,9 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.kedamp.pinakas',
-  appName: 'Pinakas Futsal Pad',
+  appName: 'PinakasFutsal',
   webDir: 'www',
-  // bundledWebRuntime: false,
   plugins: {
-
     SplashScreen: {
       launchShowDuration: 0,
       launchAutoHide: true,
@@ -23,13 +21,7 @@ const config: CapacitorConfig = {
       layoutName: "launch_screen",
       useDialog: true,
     },
-    
   },
 };
 
 export default config;
-
-
-
-
-

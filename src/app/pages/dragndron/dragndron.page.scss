@@ -267,7 +267,7 @@ ion-title {
     max-width: 10px;
     text-align: center;
     pointer-events: auto; // Asegura que sean clickeables
-    color: white;
+    color: green;
   }
 }
 
@@ -297,7 +297,7 @@ ion-title {
   flex-direction: column;
   align-items: center; /* Centrar horizontalmente */
   justify-content: center; /* Centrar verticalmente si es necesario */
-  gap: 4px; /* Espaciado entre los elementos */
+  gap: 6px; /* Espaciado entre los elementos */
 }
 
 ion-segment-button {

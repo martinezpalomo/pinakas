@@ -95,7 +95,7 @@ export class DragndronPage implements OnInit, OnDestroy {
   private animationFrames: { x: number; y: number }[][] = [];
   private currentFrameIndex: number = -1;
 
-  animationSpeed: number = 0.25; // Velocidad inicial
+  animationSpeed: number = 0.5; // Velocidad inicial
   actualizarIntervalo: number = 500; //
   animationInterval: any;
   isAnimating = false;
@@ -104,6 +104,10 @@ export class DragndronPage implements OnInit, OnDestroy {
 
   isCollapsed = false;
   isCollapsed2 = false;
+
+
+  animationValues: number[] = [0.30, 0.50, 0.70];
+  currentIndex: number = 1;
   
 
   constructor(
@@ -971,19 +975,24 @@ export class DragndronPage implements OnInit, OnDestroy {
     this.currentFrameIndex = -1;
   }
 
-  updateAnimationSpeed(event: any) {
+  // updateAnimationSpeed(event: any) {
   
-    const newValue = parseFloat(event?.detail?.value);
-    if (!isNaN(newValue)) {
-      this.animationSpeed = newValue;
-    } else {
-      console.warn("Valor no válido recibido:", event.detail.value);
-    }
+  //   const newValue = parseFloat(event?.detail?.value);
+  //   if (!isNaN(newValue)) {
+  //     this.animationSpeed = newValue;
+  //   } else {
+  //     console.warn("Valor no válido recibido:", event.detail.value);
+  //   }
+  // }
+  
+  updateAnimationSpeed() {
+    // Incrementar el índice y asegurarse de que se reinicie cuando se llegue al final
+    this.currentIndex = (this.currentIndex + 1) % this.animationValues.length;
+    
+    this.animationSpeed = this.animationValues[this.currentIndex];
+
   }
   
-  
-  
-
 
   smoothTransition(startPositions: any[], endPositions: any[], duration: number, onComplete: () => void) {
     const steps = Math.min(60, Math.max(10, duration / 16)); // Máximo 60 FPS
@@ -995,6 +1004,9 @@ export class DragndronPage implements OnInit, OnDestroy {
         onComplete();
         return;
       }
+
+      // Hacer la transición aún más lenta multiplicando stepTime por un factor de aceleración
+      const adjustedStepTime = stepTime * (1 / this.animationSpeed); // Inversamente proporcional
   
       this.positions = startPositions.map((start, i) => ({
         x: start.x + ((endPositions[i].x - start.x) * (step / steps)),
@@ -1004,7 +1016,7 @@ export class DragndronPage implements OnInit, OnDestroy {
       this.drawVoronoi();
       step++;
   
-      requestAnimationFrame(interpolateStep);
+      setTimeout(() => requestAnimationFrame(interpolateStep), adjustedStepTime);
     };
   
     interpolateStep();
@@ -1014,9 +1026,12 @@ export class DragndronPage implements OnInit, OnDestroy {
     const steps = 10; // Cantidad de pasos en la interpolación
     const stepTime = duration / steps;
     let step = 0;
-  
+
     const interpolateStep = () => {
       if (step >= steps) return;
+
+      // Hacer la transición aún más lenta multiplicando stepTime por un factor de aceleración
+      const adjustedStepTime = stepTime * (1 / this.animationSpeed); // Inversamente proporcional
   
       this.positions = startPositions.map((start, i) => ({
         x: start.x + ((endPositions[i].x - start.x) * (step / steps)),
@@ -1026,7 +1041,7 @@ export class DragndronPage implements OnInit, OnDestroy {
       this.drawVoronoi();
       step++;
   
-      setTimeout(() => requestAnimationFrame(interpolateStep), stepTime);
+      setTimeout(() => requestAnimationFrame(interpolateStep), adjustedStepTime);
     };
   
     interpolateStep();

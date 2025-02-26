@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { DragndronPage } from './pages/dragndron/dragndron.page'; 
+import { DragndronPage } from './pages/dragndron/dragndron.page';
 
-// Define your routes
 const routes: Routes = [
   {
     path: 'home',
@@ -13,9 +12,17 @@ const routes: Routes = [
     redirectTo: 'dragndron',
     pathMatch: 'full'
   },
+  // {
+  //   path: 'dragndron',
+  //   loadChildren: () => import('./pages/dragndron/dragndron.module').then( m => m.DragndronPageModule)
+  // },
   {
     path: 'dragndron',
-    component: DragndronPage,
+    component: DragndronPage,  // Ya no es necesario agregar a un NgModule
+  },
+  {
+    path: 'soporte',
+    loadChildren: () => import('./pages/soporte/soporte.module').then( m => m.SoportePageModule)
   },
 ];
 
@@ -23,9 +30,6 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
   ],
-  exports: [RouterModule],
+  exports: [RouterModule]
 })
-export class AppRoutingModule {
-  // Expose the routes array so it can be used in main.ts
-  static routes = routes;
-}
+export class AppRoutingModule { }

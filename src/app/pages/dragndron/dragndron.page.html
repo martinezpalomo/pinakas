@@ -4,7 +4,7 @@
     <!-- <ion-buttons slot="start">
       <ion-back-button (click)="back()"></ion-back-button>
     </ion-buttons> -->
-    <ion-buttons slot="end">
+
 
       <!-- <ion-buttons slot="start">
       
@@ -19,23 +19,37 @@
           <ion-icon name="refresh-circle-outline" size="large" style="margin-right: 15px;"></ion-icon>
         </ion-button>
       </ion-buttons> -->
-      <ion-button (click)="saveFrame()">Save Frame</ion-button>
-      <ion-button (click)="playAnimationWithDelay()"><ion-icon name="play"></ion-icon></ion-button>
-      <ion-button (click)="stopAnimation()"><ion-icon name="stop"></ion-icon></ion-button>
-      <ion-button (click)="resetAnimation()"><ion-icon name="refresh"></ion-icon></ion-button>
+      <ion-buttons slot="secondary">
+        <ion-button (click)="saveFrame()">Save Frame</ion-button>
+      </ion-buttons>
 
-      <ion-button *ngIf="isNumberVisible" (click)="assignUniqueNumbers()">
+      <!-- <ion-button (click)="updateAnimationSpeed($event)">0.1x</ion-button>
+      <ion-button (click)="updateAnimationSpeed($event)">0.2x</ion-button>
+      <ion-button (click)="updateAnimationSpeed($event)">0.5x</ion-button>
+      <ion-button (click)="updateAnimationSpeed($event)">1x</ion-button> -->
+
+      <ion-buttons slot="primary" style="gap: 6px;">
+        <ion-button (click)="updateAnimationSpeed()"> {{ animationSpeed }}x</ion-button>
+        <!-- <p>Velocidad de Animación: {{ animationSpeed }}x</p> -->
+        <ion-button (click)="playAnimationWithDelay()"><ion-icon name="play" size="large"></ion-icon></ion-button>
+        <ion-button (click)="stopAnimation()"><ion-icon name="stop" size="large"></ion-icon></ion-button>
+        <ion-button (click)="resetAnimation()"><ion-icon name="refresh" size="large"></ion-icon></ion-button>
+      </ion-buttons>
+
+      <!-- <ion-button *ngIf="isNumberVisible" (click)="assignUniqueNumbers()">
         <ion-icon name="eye-outline" size="large"></ion-icon>
         <span style="font-size: 1.2rem;">#</span>
-      </ion-button>
+      </ion-button> -->
 
-      <ion-button *ngIf="!isNumberVisible" (click)="removeNumberFromAllCircles()">
+      <!-- <ion-button *ngIf="!isNumberVisible" (click)="removeNumberFromAllCircles()">
         <ion-icon name="eye-off-outline" size="large"></ion-icon>
         <span style="font-size: 1.2rem;">#</span>
-      </ion-button>
+      </ion-button> -->
+      <ion-buttons slot="end">
       <!-- Botón para abrir el menú -->
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
+  
   </ion-toolbar>
 
   <!-- Sección para los botones de patrones -->
@@ -91,8 +105,8 @@
       <!-- Delaunay -->
       <ion-button (click)="mostrarDelaunay()">
 
-        <span *ngIf="showDelaunay == true" style="font-size: 1.5rem;">Vor</span>
-        <span *ngIf="showDelaunay == false" style="font-size: 1.5rem;">Del</span>
+        <span *ngIf="showDelaunay == true" style="font-size: 1.5rem;">Voro</span>
+        <span *ngIf="showDelaunay == false" style="font-size: 1.5rem;">Dela</span>
       </ion-button>
 
       <!-- Giro Horizontal -->
@@ -188,7 +202,7 @@
       <!-- Delaunay  / Voronoi-->
       <ion-item *ngIf="showDelaunay == true" (click)="mostrarDelaunay()">
         <ion-icon name="map-outline"></ion-icon>
-        <span style="font-size: 1.5rem;">Voronoi--</span>
+        <span style="font-size: 1.5rem;">Voronoi</span>
       </ion-item>
       <ion-item *ngIf="showDelaunay == false" (click)="mostrarDelaunay()">
         <ion-icon name="git-merge-outline"></ion-icon>
@@ -256,11 +270,21 @@
       <button (click)="flipCirclesHorizontally()">
         <ion-icon name="prism" size="large"></ion-icon>
       </button>
+
+      <button *ngIf="isNumberVisible" (click)="assignUniqueNumbers()">
+        <ion-icon name="eye-outline" size="large"></ion-icon>
+        <span style="font-size: 1.2rem;">#</span>
+      </button>
+
+      <button *ngIf="!isNumberVisible" (click)="removeNumberFromAllCircles()">
+        <ion-icon name="eye-off-outline" size="large"></ion-icon>
+        <span style="font-size: 1.2rem;">#</span>
+      </button>
     </div>
 
   </div>
 
-<!-- 
+  <!-- 
   <div class="alturaPatron" id="movableDiv2" [ngClass]="{'collapsed': isCollapsed2}">
   
     <div class="toggle-icon" (click)="toggleMovableDiv2()">

@@ -1,0 +1,51 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Soporte Técnico</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Sección de formulario -->
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Formulario de Soporte</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <section id="formulario" class="contenido">
+    <h2>Formulario de Soporte</h2>
+    <p>Si tienes alguna pregunta, por favor completa el siguiente formulario y nuestro equipo de soporte se pondrá en contacto contigo lo antes posible.</p>
+    <form (ngSubmit)="enviarConsulta()">
+      <ion-item>
+        <ion-label position="floating">Nombre</ion-label>
+        <ion-input [(ngModel)]="nombre" name="nombre" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Correo Electrónico</ion-label>
+        <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Consulta</ion-label>
+        <ion-textarea [(ngModel)]="consulta" name="consulta" rows="4" required></ion-textarea>
+      </ion-item>
+
+      <ion-button expand="full" type="submit">Enviar Consulta</ion-button>
+    </form>
+  </section>
+
+  <!-- Sección de FAQ -->
+  <section id="faq" class="contenido">
+    <h2>Preguntas Frecuentes (FAQ)</h2>
+    <div *ngFor="let item of faqItems" class="faq-item">
+      <ion-item (click)="toggleFAQ(item)">
+        <ion-label>
+          <h3>{{ item.pregunta }}</h3>
+        </ion-label>
+      </ion-item>
+      <ion-item *ngIf="item.mostrarRespuesta">
+        <ion-label>{{ item.respuesta }}</ion-label>
+      </ion-item>
+    </div>
+  </section>
+</ion-content>
