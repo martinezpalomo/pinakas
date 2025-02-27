@@ -230,7 +230,14 @@
 <ion-content class="ion-padding" id="main-content">
   <div style="position: relative; width: 100%; height: 100%;">
     <canvas id="extraCanvas"></canvas>
-    <canvas #canvas style="width: 100%; height: 100%; cursor: grab;"></canvas>
+    <canvas 
+  #canvas 
+  style="width: 100%; height: 100%; cursor: grab;" 
+  (pointerdown)="onPointerDown($event); onDrawStart($event)" 
+  (pointermove)="onPointerMove($event); onDrawMove($event)" 
+  (pointerup)="onPointerUp(); onDrawEnd()">
+</canvas>
+
 
     <!-- <canvas #canvas (pointerdown)="onPointerDown($event, circleId)" (pointermove)="onPointerMove($event, circleId)"> -->
     <!-- </canvas> -->

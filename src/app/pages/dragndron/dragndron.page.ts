@@ -106,8 +106,13 @@ export class DragndronPage implements OnInit, OnDestroy {
   isCollapsed2 = false;
 
 
-  animationValues: number[] = [0.30, 0.50, 0.70];
+  animationValues: number[] = [0.30, 0.50, 0.70, 1.00];
   currentIndex: number = 1;
+
+  isDrawing = false;
+  drawPath: { x: number, y: number }[] = []; // Almacena los puntos dibujados
+  isMovingCircle = false;
+
   
 
   constructor(
@@ -261,40 +266,91 @@ export class DragndronPage implements OnInit, OnDestroy {
   }
 
   onPointerDown(event: PointerEvent) {
-
-    event.preventDefault();
-
     const { x, y } = this.getCanvasCoordinates(event);
     const tolerance = this.circleDiameter / 2;
-
+  
     this.draggingIndex = this.positions.findIndex((pos) => {
       const distance = Math.hypot(pos.x - x, pos.y - y);
       return distance <= tolerance;
     });
-
+  
     if (this.draggingIndex !== -1) {
+      this.isMovingCircle = true; // Si encontró un círculo, se mueve
       this.offsetX = x - this.positions[this.draggingIndex].x;
       this.offsetY = y - this.positions[this.draggingIndex].y;
+    } else {
+      this.onDrawStart(event); // Si no hay círculo, se dibuja
     }
   }
-
+  
   onPointerMove(event: PointerEvent) {
-    if (this.draggingIndex === null) return;
+    if (this.isMovingCircle) {
+      this.moveCircle(event);
+    } else if (this.isDrawing) {
+      this.onDrawMove(event);
+    }
+  }
+  
+  onPointerUp() {
+    this.isMovingCircle = false;
+    this.isDrawing = false;
+  }
 
+  moveCircle(event: PointerEvent) {
     const now = performance.now();
     if (now - this.lastUpdateTime < this.updateInterval) return;
     this.lastUpdateTime = now;
-
+  
     const { x, y } = this.getCanvasCoordinates(event);
-    this.positions[this.draggingIndex] = { x: x - this.offsetX, y: y - this.offsetY };
-
+    
+    if (this.draggingIndex !== null && this.draggingIndex !== -1) {
+      this.positions[this.draggingIndex] = { x: x - this.offsetX, y: y - this.offsetY };
+    }
+    
+  
     requestAnimationFrame(() => {
       this.drawVoronoi();
     });
   }
-
-  onPointerUp() {
-    this.draggingIndex = null;
+  
+  onDrawStart(event: PointerEvent) {
+    this.isDrawing = true;
+    const { x, y } = this.getCanvasCoordinates(event);
+    this.drawPath = [{ x, y }];
+  }
+  
+  onDrawMove(event: PointerEvent) {
+    if (!this.isDrawing) return;
+  
+    const { x, y } = this.getCanvasCoordinates(event);
+    this.drawPath.push({ x, y });
+  
+    this.drawOnCanvas();
+  }
+  
+  onDrawEnd() {
+    this.isDrawing = false;
+  }
+  
+  drawOnCanvas() {
+    const ctx = this.canvas.getContext("2d");
+    if (!ctx) return;
+  
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.drawVoronoi(); // Redibujar Voronoi para no perderlo
+  
+    if (this.drawPath.length < 2) return;
+  
+    ctx.beginPath();
+    ctx.moveTo(this.drawPath[0].x, this.drawPath[0].y);
+  
+    for (const point of this.drawPath) {
+      ctx.lineTo(point.x, point.y);
+    }
+  
+    ctx.strokeStyle = "green";
+    ctx.lineWidth = 3;
+    ctx.stroke();
   }
 
   getCanvasCoordinates(event: PointerEvent) {
