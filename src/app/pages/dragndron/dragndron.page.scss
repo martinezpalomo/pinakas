@@ -117,7 +117,9 @@ canvas {
   border-radius: 15%;        
   border: none;               
   cursor: pointer;          
-  transition: background 0.3s ease-in-out;
+  // transition: background 0.3s ease-in-out;
+    /* Propiedad abreviada de la transición */
+    transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 .alturaPatron button:hover {

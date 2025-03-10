@@ -24,6 +24,10 @@ const routes: Routes = [
     path: 'soporte',
     loadChildren: () => import('./pages/soporte/soporte.module').then( m => m.SoportePageModule)
   },
+  {
+    path: 'privacidad',
+    loadChildren: () => import('./pages/privacidad/privacidad.module').then( m => m.PrivacidadPageModule)
+  },
 ];
 
 @NgModule({

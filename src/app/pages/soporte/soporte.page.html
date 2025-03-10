@@ -11,28 +11,22 @@
       <ion-title size="large">Formulario de Soporte</ion-title>
     </ion-toolbar>
   </ion-header>
-  <section id="formulario" class="contenido">
-    <h2>Formulario de Soporte</h2>
-    <p>Si tienes alguna pregunta, por favor completa el siguiente formulario y nuestro equipo de soporte se pondrá en contacto contigo lo antes posible.</p>
-    <form (ngSubmit)="enviarConsulta()">
-      <ion-item>
-        <ion-label position="floating">Nombre</ion-label>
-        <ion-input [(ngModel)]="nombre" name="nombre" required></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Correo Electrónico</ion-label>
-        <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Consulta</ion-label>
-        <ion-textarea [(ngModel)]="consulta" name="consulta" rows="4" required></ion-textarea>
-      </ion-item>
-
-      <ion-button expand="full" type="submit">Enviar Consulta</ion-button>
-    </form>
+  <section id="formulario" class="contenido" style="text-align: center;">
+    <h2>Contacto</h2>
+    <p>Si tienes alguna pregunta, por favor envíanos un correo electrónico a:</p>
+    
+    <!-- Dirección de correo centrada -->
+    <p>
+      <a href="mailto:xxx&#64;outlook.com" 
+         style="font-size: 18px; font-weight: bold; color: #0078d4;">
+         martinez.palomo&#64;outlook.com
+      </a>
+    </p>
+    
+    <!-- Icono de sobre de correo centrado -->
+    <ion-icon name="mail-outline" style="font-size: 50px; display: block; margin: 20px auto; color: #0078d4;"></ion-icon>
   </section>
+  
 
   <!-- Sección de FAQ -->
   <section id="faq" class="contenido">

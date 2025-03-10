@@ -39,8 +39,6 @@ export class DragndronPage implements OnInit, OnDestroy {
   // @ViewChild('canvas', { static: true }) canvasRef: ElementRef<HTMLCanvasElement> | undefined;
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
 
-
-
   colors: string[] = ['#FF8000', '#0000FF', '#000000'];
   positions: { x: number; y: number }[] = [];
   draggingIndex: number | null = null;
@@ -113,7 +111,8 @@ export class DragndronPage implements OnInit, OnDestroy {
   drawPath: { x: number, y: number }[] = []; // Almacena los puntos dibujados
   isMovingCircle = false;
 
-  
+  paths: { x: number, y: number }[][] = []; // Almacena múltiples rutas
+  pathsVisible = true;
 
   constructor(
     private router: Router,
@@ -152,8 +151,8 @@ export class DragndronPage implements OnInit, OnDestroy {
       movableDiv2.addEventListener("touchend", () => this.onTouchEnd());
 
     }
-    
-    
+
+
 
     window.addEventListener('resize', this.onResize.bind(this));
   }
@@ -275,26 +274,58 @@ export class DragndronPage implements OnInit, OnDestroy {
     });
   
     if (this.draggingIndex !== -1) {
-      this.isMovingCircle = true; // Si encontró un círculo, se mueve
+      this.isMovingCircle = true;  // Si encontró un círculo, se mueve
       this.offsetX = x - this.positions[this.draggingIndex].x;
       this.offsetY = y - this.positions[this.draggingIndex].y;
     } else {
-      this.onDrawStart(event); // Si no hay círculo, se dibuja
+      this.pathsVisible = true;    // Habilita el dibujo de rutas solo si no se mueve un círculo
+      this.onDrawStart(event);     // Si no hay círculo, se empieza a dibujar
     }
   }
   
   onPointerMove(event: PointerEvent) {
     if (this.isMovingCircle) {
+      // Si se está moviendo un círculo, no se dibuja nada
       this.moveCircle(event);
     } else if (this.isDrawing) {
+      // Si se está dibujando, entonces se llama a onDrawMove
       this.onDrawMove(event);
     }
   }
   
+  
+
   onPointerUp() {
+    if (this.isDrawing) {
+      this.onDrawEnd();
+    }
     this.isMovingCircle = false;
-    this.isDrawing = false;
   }
+
+  onDrawStart(event: PointerEvent) {
+    this.isDrawing = true;
+    this.drawPath = [];
+    const { x, y } = this.getCanvasCoordinates(event);
+    this.drawPath.push({ x, y });
+  }
+
+  onDrawMove(event: PointerEvent) {
+    if (!this.isDrawing) return; // No hace nada si no se está dibujando.
+  
+    const { x, y } = this.getCanvasCoordinates(event);
+    this.drawPath.push({ x, y });
+  
+    this.drawOnCanvas(); // Dibuja las líneas
+  }
+  
+
+  onDrawEnd() {
+    this.isDrawing = false;
+    this.paths.push([...this.drawPath]); // Almacena la ruta
+    this.drawPath = []; // Reinicia la ruta actual
+    this.drawOnCanvas();
+  }
+
 
   moveCircle(event: PointerEvent) {
     const now = performance.now();
@@ -302,57 +333,61 @@ export class DragndronPage implements OnInit, OnDestroy {
     this.lastUpdateTime = now;
   
     const { x, y } = this.getCanvasCoordinates(event);
-    
-    if (this.draggingIndex !== null && this.draggingIndex !== -1) {
-      this.positions[this.draggingIndex] = { x: x - this.offsetX, y: y - this.offsetY };
-    }
-    
   
+    if (this.draggingIndex !== null && this.draggingIndex !== -1) {
+      // Actualiza la posición del círculo sin dibujar ninguna línea
+      this.positions[this.draggingIndex] = { x: x - this.offsetX, y: y - this.offsetY };
+      this.isDrawing = false;
+    }
+  
+    // Redibuja solo los elementos estáticos (Voronoi), sin las líneas
     requestAnimationFrame(() => {
-      this.drawVoronoi();
+      this.drawVoronoi();  // Solo redibuja el Voronoi o elementos estáticos
     });
   }
   
-  onDrawStart(event: PointerEvent) {
-    this.isDrawing = true;
-    const { x, y } = this.getCanvasCoordinates(event);
-    this.drawPath = [{ x, y }];
-  }
   
-  onDrawMove(event: PointerEvent) {
-    if (!this.isDrawing) return;
-  
-    const { x, y } = this.getCanvasCoordinates(event);
-    this.drawPath.push({ x, y });
-  
-    this.drawOnCanvas();
-  }
-  
-  onDrawEnd() {
-    this.isDrawing = false;
-  }
-  
-  drawOnCanvas() {
-    const ctx = this.canvas.getContext("2d");
-    if (!ctx) return;
-  
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawVoronoi(); // Redibujar Voronoi para no perderlo
-  
-    if (this.drawPath.length < 2) return;
-  
-    ctx.beginPath();
-    ctx.moveTo(this.drawPath[0].x, this.drawPath[0].y);
-  
-    for (const point of this.drawPath) {
-      ctx.lineTo(point.x, point.y);
-    }
-  
-    ctx.strokeStyle = "green";
-    ctx.lineWidth = 3;
-    ctx.stroke();
-  }
 
+  // ACA SE DIBUJAN LAS LINEAS Y SE HAN COLOCADO TEMPORALMENTE COMO COMENTARIOS PARA REVISION
+  drawOnCanvas() {
+    if (!this.context) return;
+  
+    // // Limpia el lienzo antes de dibujar
+    // this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  
+    // Redibuja otros elementos estáticos, como el Voronoi
+    this.drawVoronoi();
+  
+    // // Solo dibuja las rutas si son visibles Y no se está moviendo un círculo
+    // if (this.pathsVisible && !this.isMovingCircle) {
+    //   this.context.strokeStyle = "rgba(0, 255, 0, 0.7)";  // Color verde con opacidad 0.7
+    //   this.context.lineWidth = 10;
+  
+    //   for (const path of this.paths) {
+    //     if (path.length < 2) continue;
+    //     this.context.beginPath();
+    //     this.context.moveTo(path[0].x, path[0].y);
+    //     for (const point of path) {
+    //       this.context.lineTo(point.x, point.y);
+    //     }
+    //     this.context.stroke();
+    //   }
+    // }
+  
+    // // Solo dibuja la ruta actual si se está dibujando
+    // if (this.isDrawing && this.drawPath.length >= 2) {
+    //   this.context.beginPath();
+    //   this.context.moveTo(this.drawPath[0].x, this.drawPath[0].y);
+    //   for (const point of this.drawPath) {
+    //     this.context.lineTo(point.x, point.y);
+    //   }
+    //   this.context.stroke();
+    // }
+  }
+  
+  
+  
+  
   getCanvasCoordinates(event: PointerEvent) {
     if (!this.context) return { x: 0, y: 0 };
 
@@ -557,16 +592,16 @@ export class DragndronPage implements OnInit, OnDestroy {
       // Establecer el tamaño del canvas (si es necesario)
       extraCanvas.width = width;
       extraCanvas.height = height;  // Altura del canvas (ajústalo según lo que necesites)
-    
+
       const extraContext = extraCanvas.getContext('2d');
       if (extraContext) {
         // Establecer el color del borde
         extraContext.strokeStyle = 'black';  // Color del borde
         extraContext.lineWidth = 5;  // Grosor del borde
-    
+
         // Establecer el color de relleno transparente (opcional, ya que es transparente por defecto)
         extraContext.fillStyle = 'transparent';  // Fondo transparente
-    
+
         // Dibujar el rectángulo con borde rojo y fondo transparente
         const rectX = (width / 2) - (centralCircleRadius / 2);  // Posición X para centrarlo
         const rectY = 4;  // Posición Y del rectángulo
@@ -765,7 +800,7 @@ export class DragndronPage implements OnInit, OnDestroy {
       this.alturaFichas -= 0.05;
       // this.calculateCirclePositions(this.sPatronAcutal); // Actualizamos las posiciones
       this.moveY = 'arriba'
-      this.updateCirclePositions();
+      this.updateCirclePositions('Y', this.moveY as 'arriba' | 'abajo');
     }
   }
 
@@ -775,7 +810,7 @@ export class DragndronPage implements OnInit, OnDestroy {
       this.alturaFichas += 0.05;
       this.moveY = 'abajo'
       // this.calculateCirclePositions(this.sPatronAcutal); // Actualizamos las posiciones
-      this.updateCirclePositions();
+      this.updateCirclePositions('Y', this.moveY as 'arriba' | 'abajo');
     }
   }
 
@@ -785,7 +820,8 @@ export class DragndronPage implements OnInit, OnDestroy {
     if (this.alturaFichas < this.maxXValue) {
       this.alturaFichas += 0.05;
       this.moveX = 'derecha';
-      this.updateCirclePositionsX();
+      this.updateCirclePositions('Y', this.moveY as 'derecha' | 'izquierda');
+      
     }
   }
 
@@ -794,69 +830,48 @@ export class DragndronPage implements OnInit, OnDestroy {
     if (this.alturaFichas > this.minXValue) {
       this.alturaFichas -= 0.05;
       this.moveX = 'izquierda';
-      this.updateCirclePositionsX();
+      this.updateCirclePositions('Y', this.moveY as 'derecha' | 'izquierda');
     }
   }
 
-  updateCirclePositions() {
-    const ajusteY = this.canvas.height / 10;
-    const radioCírculo = 10; // Asumimos que el radio del círculo es de 10px, ajusta según sea necesario
-
-    // Ajustamos las posiciones Y de los círculos según el valor de alturaFichas
-    const adjustment = this.moveY == 'arriba' ? -ajusteY : ajusteY;
-
-    // Verificamos la condición del patrón solo una vez
+  updateCirclePositions(direction: 'X' | 'Y', move: 'arriba' | 'abajo' | 'izquierda' | 'derecha') {
+    const ajuste = direction === 'Y' ? this.canvas.height / 10 : this.canvas.width / 10;
+    const radioCírculo = 10;
+    const adjustment = (move === 'arriba' || move === 'izquierda') ? -ajuste : ajuste;
     const isPatternSist = this.sPatronAcutal.slice(0, 4).toLowerCase() === 'sist';
-
-    // Primero verificamos si al menos uno de los círculos desborda los límites
+  
     let shouldStop = false;
     this.positions.forEach((position, index) => {
-      // Solo procesamos los círculos que no están excluidos
       if (!(index === 0 || index === 5 || (isPatternSist && index === 10))) {
-        let nuevaY = position.y + adjustment;
-
-        // Aseguramos que el círculo no se salga del canvas en el eje Y
-        if (nuevaY - radioCírculo < 0 || nuevaY + radioCírculo > this.canvas.height) {
-          shouldStop = true;  // Si hay un desbordamiento, marcamos que debemos detener la modificación
+        let nuevaPos = direction === 'Y' ? position.y + adjustment : position.x + adjustment;
+        const limite = direction === 'Y' ? this.canvas.height : this.canvas.width;
+  
+        if (nuevaPos - radioCírculo < 0 || nuevaPos + radioCírculo > limite) {
+          shouldStop = true;
         }
       }
     });
-
-    // Si se detectó que algún círculo desborda, no realizamos ninguna modificación
-    if (shouldStop) {
-      // console.log("Desbordamiento detectado. No se aplicaron cambios.");
-      return; // Detener la ejecución y no realizar modificaciones
-    }
-
-    // Si no hay desbordamientos, procedemos con la modificación de las posiciones
+  
+    if (shouldStop) return;
+  
     this.positions = this.positions.map((position, index) => {
-      // Condición para los índices que no deben cambiar
-      const shouldNotModify = (index === 0 || index === 5 || (isPatternSist && index === 10));
-
-      if (shouldNotModify) {
+      if (index === 0 || index === 5 || (isPatternSist && index === 10)) {
         return position;
-      } else {
-        // Nueva posición Y ajustada
-        let nuevaY = position.y + adjustment;
-
-        // Aseguramos que el círculo no se salga del canvas en el eje Y
-        if (nuevaY - radioCírculo < 0) {
-          nuevaY = radioCírculo;  // Si el círculo intenta salir por arriba, lo ponemos en el borde superior
-        } else if (nuevaY + radioCírculo > this.canvas.height) {
-          nuevaY = this.canvas.height - radioCírculo;  // Si el círculo intenta salir por abajo, lo ponemos en el borde inferior
-        }
-
-        return {
-          x: position.x,
-          y: nuevaY  // Usamos la nueva posición Y ajustada
-        };
       }
+  
+      let nuevaPos = direction === 'Y' ? position.y + adjustment : position.x + adjustment;
+      const limite = direction === 'Y' ? this.canvas.height : this.canvas.width;
+  
+      if (nuevaPos - radioCírculo < 0) nuevaPos = radioCírculo;
+      if (nuevaPos + radioCírculo > limite) nuevaPos = limite - radioCírculo;
+  
+      return direction === 'Y'
+        ? { x: position.x, y: nuevaPos }
+        : { x: nuevaPos, y: position.y };
     });
-
-    // Redibujamos las celdas de Voronoi después de ajustar las posiciones
+  
     this.drawVoronoi();
   }
-
 
   updateCirclePositionsX() {
     const ajusteX = this.canvas.width / 10; // Ajuste de movimiento horizontal
@@ -924,7 +939,7 @@ export class DragndronPage implements OnInit, OnDestroy {
     this.startX = (event as MouseEvent).clientX || (event as TouchEvent).touches[0].clientX;
     this.startY = (event as MouseEvent).clientY || (event as TouchEvent).touches[0].clientY;
   }
-  
+
 
   onMouseMove(event: MouseEvent | TouchEvent) {
     if (!this.isDragging || !this.draggedElementId) return;
@@ -932,23 +947,23 @@ export class DragndronPage implements OnInit, OnDestroy {
     if (element) {
       const clientX = (event as MouseEvent).clientX || (event as TouchEvent).touches[0].clientX;
       const clientY = (event as MouseEvent).clientY || (event as TouchEvent).touches[0].clientY;
-  
+
       this.currentX += clientX - this.startX;
       this.currentY += clientY - this.startY;
       this.setPosition(this.draggedElementId);
-      
+
       this.startX = clientX;
       this.startY = clientY;
     }
   }
-  
-  
+
+
   onMouseUp(event: MouseEvent | TouchEvent) {
     this.isDragging = false;
     this.draggedElementId = null;
   }
-  
-  
+
+
   // Touch events
   onTouchStart(event: TouchEvent, elementId: string) {
     this.isDragging = true;
@@ -957,7 +972,7 @@ export class DragndronPage implements OnInit, OnDestroy {
     this.startX = touch.clientX;
     this.startY = touch.clientY;
   }
-  
+
 
   onTouchMove(event: TouchEvent) {
     if (this.isDragging && this.draggedElementId) {
@@ -967,7 +982,7 @@ export class DragndronPage implements OnInit, OnDestroy {
       this.setPosition(this.draggedElementId); // Ahora pasamos el ID correcto
     }
   }
-  
+
 
   onTouchEnd() {
     this.isDragging = false;
@@ -980,7 +995,7 @@ export class DragndronPage implements OnInit, OnDestroy {
       element.style.transform = `translate(${this.currentX}px, ${this.currentY}px)`;
     }
   }
-  
+
 
   mostrarDelaunay() {
     this.showDelaunay = !this.showDelaunay;
@@ -998,33 +1013,33 @@ export class DragndronPage implements OnInit, OnDestroy {
   playAnimation() {
 
     if (this.animationFrames.length === 0 || this.isAnimating) return;
-  
+
     let index = 0;
     const intervalTime = Math.max(50, (this.actualizarIntervalo / this.animationSpeed));
-  
+
     this.isAnimating = true;
-  
+
     const animate = () => {
       if (!this.isAnimating || index >= this.animationFrames.length - 1) {
         this.isAnimating = false;
         return;
       }
-  
+
       this.smoothTransition(this.animationFrames[index], this.animationFrames[index + 1], intervalTime, () => {
         index++;
         if (this.isAnimating) requestAnimationFrame(animate);
       });
     };
-  
+
     animate();
   }
-  
-  
+
+
   stopAnimation() {
     this.isAnimating = false; // Detener la animación
   }
-  
-  
+
+
 
   resetAnimation() {
     this.animationFrames = [];
@@ -1032,7 +1047,7 @@ export class DragndronPage implements OnInit, OnDestroy {
   }
 
   // updateAnimationSpeed(event: any) {
-  
+
   //   const newValue = parseFloat(event?.detail?.value);
   //   if (!isNaN(newValue)) {
   //     this.animationSpeed = newValue;
@@ -1040,21 +1055,21 @@ export class DragndronPage implements OnInit, OnDestroy {
   //     console.warn("Valor no válido recibido:", event.detail.value);
   //   }
   // }
-  
+
   updateAnimationSpeed() {
     // Incrementar el índice y asegurarse de que se reinicie cuando se llegue al final
     this.currentIndex = (this.currentIndex + 1) % this.animationValues.length;
-    
+
     this.animationSpeed = this.animationValues[this.currentIndex];
 
   }
-  
+
 
   smoothTransition(startPositions: any[], endPositions: any[], duration: number, onComplete: () => void) {
     const steps = Math.min(60, Math.max(10, duration / 16)); // Máximo 60 FPS
     const stepTime = duration / steps;
     let step = 0;
-  
+
     const interpolateStep = () => {
       if (!this.isAnimating || step >= steps) {
         onComplete();
@@ -1063,18 +1078,18 @@ export class DragndronPage implements OnInit, OnDestroy {
 
       // Hacer la transición aún más lenta multiplicando stepTime por un factor de aceleración
       const adjustedStepTime = stepTime * (1 / this.animationSpeed); // Inversamente proporcional
-  
+
       this.positions = startPositions.map((start, i) => ({
         x: start.x + ((endPositions[i].x - start.x) * (step / steps)),
         y: start.y + ((endPositions[i].y - start.y) * (step / steps))
       }));
-  
+
       this.drawVoronoi();
       step++;
-  
+
       setTimeout(() => requestAnimationFrame(interpolateStep), adjustedStepTime);
     };
-  
+
     interpolateStep();
   }
 
@@ -1088,40 +1103,50 @@ export class DragndronPage implements OnInit, OnDestroy {
 
       // Hacer la transición aún más lenta multiplicando stepTime por un factor de aceleración
       const adjustedStepTime = stepTime * (1 / this.animationSpeed); // Inversamente proporcional
-  
+
       this.positions = startPositions.map((start, i) => ({
         x: start.x + ((endPositions[i].x - start.x) * (step / steps)),
         y: start.y + ((endPositions[i].y - start.y) * (step / steps))
       }));
-  
+
       this.drawVoronoi();
       step++;
-  
+
       setTimeout(() => requestAnimationFrame(interpolateStep), adjustedStepTime);
     };
-  
+
     interpolateStep();
   }
 
   playAnimationWithDelay() {
     if (this.animationFrames.length === 0) return;
-  
+
     this.positions = JSON.parse(JSON.stringify(this.animationFrames[0])); // Ubicar en el primer frame
     this.drawVoronoi(); // Dibujar el primer frame
-  
+
     setTimeout(() => {
       this.playAnimation();
     }, 1000);
   }
-  
+
   toggleMovableDiv() {
     this.isCollapsed = !this.isCollapsed;
   }
 
 
 
-toggleMovableDiv2() {
-  this.isCollapsed2 = !this.isCollapsed2;
-}
+  toggleMovableDiv2() {
+    this.isCollapsed2 = !this.isCollapsed2;
+  }
+
+  clearPaths() {
+    this.paths = []; // Borra todas las rutas
+    this.drawOnCanvas(); // Redibuja el lienzo
+  }
+
+  toggleVisibility() {
+    this.pathsVisible = !this.pathsVisible;
+    this.drawOnCanvas(); // Redibuja el lienzo para reflejar cambios
+  }
 
 }
