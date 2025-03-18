@@ -352,37 +352,37 @@ export class DragndronPage implements OnInit, OnDestroy {
   drawOnCanvas() {
     if (!this.context) return;
   
-    // // Limpia el lienzo antes de dibujar
-    // this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    // Limpia el lienzo antes de dibujar
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   
     // Redibuja otros elementos estáticos, como el Voronoi
     this.drawVoronoi();
   
-    // // Solo dibuja las rutas si son visibles Y no se está moviendo un círculo
-    // if (this.pathsVisible && !this.isMovingCircle) {
-    //   this.context.strokeStyle = "rgba(0, 255, 0, 0.7)";  // Color verde con opacidad 0.7
-    //   this.context.lineWidth = 10;
+    // Solo dibuja las rutas si son visibles Y no se está moviendo un círculo
+    if (this.pathsVisible && !this.isMovingCircle) {
+      this.context.strokeStyle = "rgba(0, 255, 0, 0.7)";  // Color verde con opacidad 0.7
+      this.context.lineWidth = 10;
   
-    //   for (const path of this.paths) {
-    //     if (path.length < 2) continue;
-    //     this.context.beginPath();
-    //     this.context.moveTo(path[0].x, path[0].y);
-    //     for (const point of path) {
-    //       this.context.lineTo(point.x, point.y);
-    //     }
-    //     this.context.stroke();
-    //   }
-    // }
+      for (const path of this.paths) {
+        if (path.length < 2) continue;
+        this.context.beginPath();
+        this.context.moveTo(path[0].x, path[0].y);
+        for (const point of path) {
+          this.context.lineTo(point.x, point.y);
+        }
+        this.context.stroke();
+      }
+    }
   
-    // // Solo dibuja la ruta actual si se está dibujando
-    // if (this.isDrawing && this.drawPath.length >= 2) {
-    //   this.context.beginPath();
-    //   this.context.moveTo(this.drawPath[0].x, this.drawPath[0].y);
-    //   for (const point of this.drawPath) {
-    //     this.context.lineTo(point.x, point.y);
-    //   }
-    //   this.context.stroke();
-    // }
+    // Solo dibuja la ruta actual si se está dibujando
+    if (this.isDrawing && this.drawPath.length >= 2) {
+      this.context.beginPath();
+      this.context.moveTo(this.drawPath[0].x, this.drawPath[0].y);
+      for (const point of this.drawPath) {
+        this.context.lineTo(point.x, point.y);
+      }
+      this.context.stroke();
+    }
   }
   
   
